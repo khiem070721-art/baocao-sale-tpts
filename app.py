@@ -28,7 +28,7 @@ def get_data():
     try:
         gc = get_gspread_client()
         # Nếu đang dùng link URL thì thay lại dòng dưới thành gc.open_by_url("link_của_anh")
-        sh = gc.open("https://docs.google.com/spreadsheets/d/1a03CxGHIOBICVKCJSUzdqJnUx7BxqiNfjez2Tvknhr4/edit?gid=0#gid=0") 
+        sh = gc.open_by_url("https://docs.google.com/spreadsheets/d/1a03CxGHIOBICVKCJSUzdqJnUx7BxqiNfjez2Tvknhr4/edit?gid=0#gid=0")
         worksheet = sh.sheet1
         records = worksheet.get_all_records()
         return pd.DataFrame(records), worksheet
