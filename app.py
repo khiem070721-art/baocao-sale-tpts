@@ -18,9 +18,8 @@ st.divider()
 # ==========================================
 # HÀM KẾT NỐI VÀ ĐỌC DỮ LIỆU TỪ GOOGLE SHEETS
 # ==========================================
-@st.cache_resource(ttl=60) # Tự động làm mới kết nối sau 60 giây
+@st.cache_resource(ttl=60)
 def get_gspread_client():
-    # Lấy chìa khóa JSON từ bảo mật của Streamlit
     credentials_dict = json.loads(st.secrets["GCP_CREDENTIALS_JSON"])
     gc = gspread.service_account_from_dict(credentials_dict)
     return gc
@@ -28,12 +27,13 @@ def get_gspread_client():
 def get_data():
     try:
         gc = get_gspread_client()
-        sh = gc.open_by_url("https://docs.google.com/spreadsheets/d/1a03CxGHIOBICVKCJSUzdqJnUx7BxqiNfjez2Tvknhr4/edit?gid=0#gid=0")
+        # Nếu đang dùng link URL thì thay lại dòng dưới thành gc.open_by_url("link_của_anh")
+        sh = gc.open("Bao_Cao_KH_TPTS") 
         worksheet = sh.sheet1
         records = worksheet.get_all_records()
         return pd.DataFrame(records), worksheet
     except Exception as e:
-        st.error(f"Lỗi kết nối Google Sheets. Vui lòng kiểm tra lại quyền chia sẻ file: {e}")
+        st.error(f"Lỗi kết nối Google Sheets: {e}")
         return pd.DataFrame(), None
 
 df, worksheet = get_data()
@@ -83,15 +83,19 @@ with tab2:
     st.subheader("Ghi Nhận Tương Tác Khách Hàng Mới")
     with st.form("daily_report_form", clear_on_submit=True):
         c1, c2, c3 = st.columns(3)
+        
         with c1:
             ngay = st.date_input("Ngày báo cáo", datetime.now())
             ten_kh = st.text_input("Tên khách hàng", placeholder="VD: Mầm non Hoa Cúc")
             nguoi_lh = st.text_input("Người liên hệ")
+            
         with c2:
             sdt = st.text_input("Số điện thoại")
             nguon = st.selectbox("Nguồn lead", DANH_SACH_NGUON)
-            doanh_thu_est = st.number_input("Doanh thu ước tính (VNĐ)", min_value=0, step=1000000)
+            san_pham = st.text_input("Sản phẩm quan tâm", placeholder="VD: Thịt Heo, Rau Củ...")
+            
         with c3:
+            doanh_thu_est = st.number_input("Doanh thu ước tính (VNĐ)", min_value=0, step=1000000)
             trang_thai = st.selectbox("Trạng thái hiện tại", DANH_SACH_TRANG_THAI)
             ghi_chu = st.text_area("Ghi chú / Hẹn tiếp theo", placeholder="VD: Gửi mẫu ăn thử vào tuần sau")
             
@@ -103,15 +107,16 @@ with tab2:
             elif worksheet is None:
                 st.error("Không tìm thấy Google Sheets. Vui lòng kiểm tra lại!")
             else:
-                # Bơm dữ liệu mới vào hàng tiếp theo trong Google Sheets
+                # TỰ ĐỘNG TÍNH STT: Lấy tổng số dòng hiện tại cộng thêm 1
+                stt = len(df) + 1 if not df.empty else 1
+                
+                # CẬP NHẬT MẢNG DỮ LIỆU: Chèn stt vào ngay sau ngày
                 new_row = [
-                    ngay.strftime("%Y-%m-%d"), ten_kh, nguon, nguoi_lh, sdt, 
-                    doanh_thu_est, trang_thai, ghi_chu
+                    ngay.strftime("%Y-%m-%d"), stt, ten_kh, nguon, nguoi_lh, sdt, 
+                    doanh_thu_est, trang_thai, ghi_chu, san_pham
                 ]
                 worksheet.append_row(new_row)
-                st.success(f"✅ Đã chốt và lưu báo cáo của {ten_kh} lên Google Sheets thành công!")
-                
-                # Nút reset trang để tải lại dữ liệu mới nhất
+                st.success(f"✅ Đã chốt và lưu báo cáo của {ten_kh} (STT: {stt}) lên Google Sheets!")
                 st.form_submit_button("🔁 Bấm vào đây để làm mới Dashboard")
 
     st.divider()
