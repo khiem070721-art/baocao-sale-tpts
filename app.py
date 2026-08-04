@@ -28,7 +28,7 @@ def get_gspread_client():
 def get_data():
     try:
         gc = get_gspread_client()
-        sh = gc.open("Bao_Cao_KH_TPTS") # Tên file Google Sheets của anh
+        sh = gc.open_by_url("https://docs.google.com/spreadsheets/d/1a03CxGHIOBICVKCJSUzdqJnUx7BxqiNfjez2Tvknhr4/edit?gid=0#gid=0")
         worksheet = sh.sheet1
         records = worksheet.get_all_records()
         return pd.DataFrame(records), worksheet
