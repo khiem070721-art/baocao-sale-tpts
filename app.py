@@ -9,7 +9,7 @@ st.set_page_config(page_title="Báo Cáo Tương Tác KH - TPTS", layout="wide",
 NHAN_VIEN = "Trần Hữu Khiêm"
 MA_NV = "NV03016"
 NGANH_HANG = "TPTS"
-THANG_BC = "08/2026"
+THANG_BC = "09/2026"
 
 st.title(f"📈 DASHBOARD PHÂN TÍCH KHÁCH HÀNG & HIỆU QUẢ BÁN HÀNG")
 st.caption(f"Tháng {THANG_BC} | Nhân viên: {NHAN_VIEN} | Mã NV: {MA_NV} | Ngành hàng: {NGANH_HANG}")
