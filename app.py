@@ -9,7 +9,7 @@ st.set_page_config(page_title="Báo Cáo Tương Tác KH - TPTS", layout="wide",
 NHAN_VIEN = "Trần Hữu Khiêm"
 MA_NV = "NV03016"
 NGANH_HANG = "TPTS"
-THANG_BC = "09/2026"
+THANG_BC = "10/2026"
 
 st.title(f"📈 DASHBOARD PHÂN TÍCH KHÁCH HÀNG & HIỆU QUẢ BÁN HÀNG")
 st.caption(f"Tháng {THANG_BC} | Nhân viên: {NHAN_VIEN} | Mã NV: {MA_NV} | Ngành hàng: {NGANH_HANG}")
@@ -29,7 +29,7 @@ def get_data():
         gc = get_gspread_client()
         # Nếu đang dùng link URL thì thay lại dòng dưới thành gc.open_by_url("link_của_anh")
         sh = gc.open_by_url("https://docs.google.com/spreadsheets/d/1a03CxGHIOBICVKCJSUzdqJnUx7BxqiNfjez2Tvknhr4/edit?gid=0#gid=0")
-        worksheet = sh.sheet1
+        worksheet = sh.worksheet("Tháng 10")
         records = worksheet.get_all_records()
         return pd.DataFrame(records), worksheet
     except Exception as e:
